@@ -1,10 +1,6 @@
 import mongoose from 'mongoose';
 
-const serviceSchema = new mongoose.Schema({
-    iconName:{
-        type:String,
-        required:false
-       },
+const projectSchema = new mongoose.Schema({
     title: {
         type: String,
         minlength: 2,
@@ -16,7 +12,14 @@ const serviceSchema = new mongoose.Schema({
         type: String,
         maxlength: 2000,
         required: true,   // Fixed 'require' to 'required'
-        unique: true
+    },
+    image: {
+        type: String,  // Store the image path as a string
+        required: true  // Make it required if necessary
+    },
+    Skills:{
+        type: String,  // Store the image path as a string
+        required: true   
     },
     link: {
         type: String,
@@ -26,5 +29,5 @@ const serviceSchema = new mongoose.Schema({
     }
 });
 
-const Services = mongoose.model('Services', serviceSchema);
-export { Services };
+const Projects = mongoose.model('projects', projectSchema);
+export { Projects };

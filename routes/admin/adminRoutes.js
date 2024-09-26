@@ -1,17 +1,26 @@
 import AdminJS from 'adminjs';
-import AdminJSExpress from '@adminjs/express';
-import AdminJSMongoose from '@adminjs/mongoose';
-import {User} from  '../../models/accounts/user';// Example model
+import { buildRouter } from '@adminjs/express';
+import { Database, Resource } from '@adminjs/mongoose'; // Correct import
+import mongoose from 'mongoose'; // Import mongoose
+import  {User} from '../../models/accounts/user.js'; // Adjusted path
+import { Services } from '../../models/main/service.js';
+import { Projects } from '../../models/main/project.js';
+import { Description } from '../../models/main/descriptions.js';
 
 
-// AdminJS setup
-AdminJS.registerAdapter(AdminJSMongoose); // Use Mongoose adapter
+// Register the AdminJS mongoose adapter with Database and Resource
+AdminJS.registerAdapter({ Database, Resource });
 
 const adminJs = new AdminJS({
-  resources: [User],  // Resources to manage in the admin panel
+  resources: [
+    { resource: User, options: {} },  // First resource
+    { resource: Services, options: {} }, 
+    { resource: Projects, options: {} },
+    { resource: Description, options: {} }, // Second resource
+  ],
   rootPath: '/admin',
 });
 
-const router = AdminJSExpress.buildRouter(adminJs);
+const router = buildRouter(adminJs);
 
-module.exports = router;
+export default router;

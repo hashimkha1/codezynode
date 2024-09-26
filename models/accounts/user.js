@@ -1,44 +1,49 @@
-const mongoose = require('mongoose');
-const Joi = require('joi')
+import mongoose from 'mongoose';
+import Joi from 'joi';
+import jwt from 'jsonwebtoken';  // Assuming jwt is required
 
-const userShcema = new mongoose.Schema({
-    username:{
-        type: String,
-        minlength:2,
-        maxlength: 25,
-        require:true,
-        unique:true
-    },
-    email:{
-        type:String,
-        minlength:2,
-        maxlength: 25,
-        require:true,
-        unique:true
+const userSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    minlength: 2,
+    maxlength: 25,
+    require: true,
+    unique: true,
+  },
+  email: {
+    type: String,
+    minlength: 2,
+    maxlength: 25,
+    require: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    minlength: 4,
+    maxlength: 255,
+    require: true,
+  },
+});
 
-    },
-    password:{
-        type:String,
-        minlength:4,
-        maxlength: 255,
-        require:true,
-    }
-})
-userShcema.methods.generateToken = function(){
-    var token = jwt.sign({ _id:this._id,username:this.username }, 'kjskjakj');  
-    return token
-}
-const User = mongoose.model('User',userShcema)
+userSchema.methods.generateToken = function () {
+  var token = jwt.sign(
+    { _id: this._id, username: this.username },
+    'kjskjakj'
+  );
+  return token;
+};
+
+const User = mongoose.model('User', userSchema);
+
 const userValidator = Joi.object({
-    username: Joi.string().required(),
-    email:Joi.string().required().email(),
-    password:Joi.string().required()
-  })
+  username: Joi.string().required(),
+  email: Joi.string().required().email(),
+  password: Joi.string().required(),
+});
+
 const loginValidator = Joi.object({
-    email:Joi.string().required().email(),
-    password:Joi.string().required()
-  })
-  
-exports.User = User;
-exports.userValidator = userValidator;
-exports.loginValidator = loginValidator;   
+  email: Joi.string().required().email(),
+  password: Joi.string().required(),
+});
+
+export { User, userValidator, loginValidator };
