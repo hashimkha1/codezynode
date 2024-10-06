@@ -6,6 +6,9 @@ import twilio from 'twilio';
 //   process.env.TWILIO_ACCOUNT_SID,
 //   process.env.TWILIO_AUTH_TOKEN
 // );
+const accountSid = "AC1e745746c6a7c1cadd765f62f628634e";
+const authToken = "b3fd449163ded27055d4b49beafdd811";
+const twilioClient = twilio(accountSid, authToken);
 
 // Email Notification Function
 export const sendEmailNotification = (message) => {
@@ -33,14 +36,14 @@ export const sendEmailNotification = (message) => {
   });
 };
 
-// // WhatsApp Notification Function
-// export const sendWhatsAppNotification = (message) => {
-//   twilioClient.messages
-//     .create({
-//       from: 'whatsapp:' + process.env.TWILIO_WHATSAPP_NUMBER,
-//       to: 'whatsapp:' + process.env.ADMIN_WHATSAPP_NUMBER,
-//       body: `You have a new message: ${message}`,
-//     })
-//     .then((msg) => console.log('WhatsApp message sent: ' + msg.sid))
-//     .catch((error) => console.log('WhatsApp Error: ', error));
-// };
+// WhatsApp Notification Function
+export const sendWhatsAppNotification = (message) => {
+  twilioClient.messages
+    .create({
+      from: 'whatsapp:' +14155238886,
+      to: 'whatsapp:' +923166815673,
+      body: `You have a new message: ${message}`,
+    })
+    .then((msg) => console.log('WhatsApp message sent: ' + msg.sid))
+    .catch((error) => console.log('WhatsApp Error: ', error));
+};

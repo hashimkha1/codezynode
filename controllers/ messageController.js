@@ -2,7 +2,7 @@
 import Message from '../models/main/Message.js';
 import {
   sendEmailNotification,
- 
+  sendWhatsAppNotification
 } from '../services/notificationService.js';
 import { generateBotResponse } from '../utils/openaiClient.js';
 import twilio from 'twilio';
@@ -14,6 +14,12 @@ export const handleSocketConnection = (io) => {
     // Initialize user choice
     socket.userChoice = null;
 
+    // Listen for user choice from the frontend
+    socket.on('userChoice', (choice) => {
+      socket.userChoice = choice.toLowerCase(); // Set the user choice to 'human' or 'bot'
+      console.log(`User choice set to: ${socket.userChoice}`);
+    });
+
     socket.on('sendMessage', async (data) => {
       const { message } = data;
 
@@ -23,26 +29,22 @@ export const handleSocketConnection = (io) => {
 
       // Check if the user has already made a choice
       if (!socket.userChoice) {
-        // First interaction
-        if (
-          message.toLowerCase() === 'human' ||
-          message.toLowerCase() === 'bot'
-        ) {
+        // First interaction - Prompt user to choose between human or bot
+        if (message.toLowerCase() === 'human' || message.toLowerCase() === 'bot') {
           socket.userChoice = message.toLowerCase();
 
           if (socket.userChoice === 'human') {
             socket.emit('receiveMessage', {
               sender: 'System',
-              message: 'Connecting you to a human agent...',
+              message: 'Connecting you to a human agent...'
             });
 
             // Notify admin
-            sendEmailNotification(message);
-            sendWhatsAppNotification(message);
-          } else {
+            sendWhatsAppNotification('A user wants to talk to a human.');
+          } else if (socket.userChoice === 'bot') {
             socket.emit('receiveMessage', {
               sender: 'System',
-              message: 'You are now chatting with the bot.',
+              message: 'You are now chatting with the bot.'
             });
 
             // Generate bot response
@@ -52,7 +54,7 @@ export const handleSocketConnection = (io) => {
           // Prompt user to choose
           socket.emit('receiveMessage', {
             sender: 'System',
-            message: 'Would you like to talk to a Human or Bot?',
+            message: 'Would you like to talk to a Human or Bot?'
           });
         }
       } else {
@@ -64,9 +66,9 @@ export const handleSocketConnection = (io) => {
 
           socket.emit('receiveMessage', {
             sender: 'System',
-            message: 'Your message has been sent to the admin.',
+            message: 'Your message has been sent to the admin.'
           });
-        } else {
+        } else if (socket.userChoice === 'bot') {
           // Generate bot response
           generateBotResponse(socket, message);
         }
@@ -80,25 +82,34 @@ export const handleSocketConnection = (io) => {
 };
 
 // WhatsApp webhook controller
-// export const receiveWhatsAppWebhook = (req, res) => {
-//   const twiml = new twilio.twiml.MessagingResponse();
-//   const messageBody = req.body.Body;
-//   const fromNumber = req.body.From;
+export const receiveWhatsAppWebhook = (req, res) => {
+  const twiml = new twilio.twiml.MessagingResponse();
 
-//   // Verify that the message is from the admin
-//   if (fromNumber === 'whatsapp:' + process.env.ADMIN_WHATSAPP_NUMBER) {
-//     const io = req.app.get('socketio');
-//     // Send the admin's message back to the user via socket.io
-//     io.emit('receiveMessage', { sender: 'Admin', message: messageBody });
+  // Extract message body and sender's number from the webhook payload
+  const messageBody = req.body.Body;
+  const fromNumber = req.body.From;
 
-//     // Save admin's message to MongoDB
-//     const adminMessage = new Message({
-//       sender: 'Admin',
-//       message: messageBody,
-//     });
-//     adminMessage.save();
-//   }
+  console.log('Message Body:', messageBody);
+  console.log('From Number:', fromNumber);
 
-//   res.writeHead(200, { 'Content-Type': 'text/xml' });
-//   res.end(twiml.toString());
-// };
+  // Verify that the message is from the admin (replace with your admin's WhatsApp number)
+  if (fromNumber === 'whatsapp:+923166815673') {
+    const io = req.app.get('socketio');
+    
+    // Emit the admin's message back to the user via socket.io
+    io.emit('receiveMessage', { sender: 'Admin', message: messageBody });
+
+    // Optionally save the message to your database (MongoDB example)
+    const adminMessage = new Message({
+      sender: 'Admin',
+      message: messageBody,
+    });
+    adminMessage.save()
+      .then(() => console.log('Admin message saved to database'))
+      .catch((err) => console.error('Error saving message:', err));
+  }
+
+  // Send an empty TwiML response to acknowledge receipt of the webhook
+  res.writeHead(200, { 'Content-Type': 'text/xml' });
+  res.end(twiml.toString());
+};

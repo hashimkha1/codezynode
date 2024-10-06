@@ -1,22 +1,21 @@
 // utils/openaiClient.js
-import  openai  from 'openai';
+import { OpenAI } from 'openai';
 import Message from '../models/main/Message.js';
 
-const configuration = new openai({
-  apiKey: 'jndjkdjkdjkjkdjkdjkdjk',
+const openai = new OpenAI({
+  apiKey: 'sk-S5UEOQWyIzaB91I6pBNfvUH_5auoS3AeEFjSLJzg-oT3BlbkFJBxMuvGVzVyuei-L7G4JOlzGCeQPn6hTa7jzAZremgA',
 });
-const openaiData = new openai(configuration);
-
 // Function to generate bot response
 export const generateBotResponse = async (socket, message) => {
+  console.log(message)
   try {
-    const response = await openai.createCompletion({
-      model: 'text-davinci-003',
-      prompt: message,
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4-1106-preview',
+      messages: [{ role: 'user', content: message }],
       max_tokens: 150,
     });
 
-    const botMessage = response.data.choices[0].text.trim();
+    const botMessage = response.choices[0].message.content;
 
     // Save bot message to MongoDB
     const botReply = new Message({ sender: 'Bot', message: botMessage });
