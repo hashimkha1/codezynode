@@ -3,7 +3,7 @@ import { OpenAI } from 'openai';
 import Message from '../models/main/Message.js';
 
 const openai = new OpenAI({
-  apiKey: 'sk-S5UEOQWyIzaB91I6pBNfvUH_5auoS3AeEFjSLJzg-oT3BlbkFJBxMuvGVzVyuei-L7G4JOlzGCeQPn6hTa7jzAZremgA',
+  apiKey: '#',
 });
 // Function to generate bot response
 export const generateBotResponse = async (socket, message) => {
