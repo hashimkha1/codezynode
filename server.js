@@ -13,20 +13,26 @@ import adminRoutes from './routes/admin/adminRoutes.js';import { createServer } 
 import { Server } from "socket.io";
 import { handleSocketConnection } from './controllers/ messageController.js';
 import bodyParser from 'body-parser';
-
+import hireUs from './routes/hire/client.js';
 const app = express();
 
 // Middlewares
 app.use(morgan('tiny'));
 app.use(express.json());
 app.use(cors());
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // MongoDB connection
+// mongoose.connect('mongodb+srv://ghulamkabira622:N9ya16OKEK8HbwqA@cluster0.cbo1p.mongodb.net/Codezy')
+//     .then(() => {
+//         console.log('ok');
+//     });
 mongoose.connect('mongodb://localhost/Codezy')
     .then(() => {
         console.log('ok');
     });
+
 
 // Uncomment if using JWT key configuration
 // if (!config.get('jwtKey')) {
@@ -35,6 +41,7 @@ mongoose.connect('mongodb://localhost/Codezy')
 // }
 
 // Routes
+
 const httpServer = createServer(app); // Create HTTP server
 // server.js
 
@@ -61,7 +68,7 @@ app.use('/api',project);
 app.use('/api',messages);
 app.use('/api',description);
 app.use('/admin', adminRoutes);
-
+app.use('/api',hireUs);
 
 
 // Start the server

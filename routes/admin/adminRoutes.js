@@ -7,6 +7,7 @@ import { Services } from '../../models/main/service.js';
 import { Projects } from '../../models/main/project.js';
 import { Description } from '../../models/main/descriptions.js';
 import Message from '../../models/main/Message.js'
+import Client from '../../models/hire/HireUs.js';
 
 
 // Register the AdminJS mongoose adapter with Database and Resource
@@ -18,7 +19,8 @@ const adminJs = new AdminJS({
     { resource: Services, options: {} }, 
     {resource: Message ,options:{},},
     { resource: Projects, options: {} },
-    { resource: Description, options: {} }, // Second resource
+    { resource: Description, options: {} },
+    { resource: Client, options: {} }, // Second resource
   ],
   rootPath: '/admin',
 });
